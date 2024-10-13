@@ -1,10 +1,9 @@
-import React, {useContext} from 'react';
-import './Navbar.css';
+import React, { useContext } from 'react';
 import { useNavigate } from 'react-router-dom';
-import {StoreContext} from "../../context/StoreContext.jsx";
+import { StoreContext } from "../../context/StoreContext.jsx";
 
 const Navbar = () => {
-    const { cartItems, setCartItems, food_list, updateQuantity, removeFromCart, url } = useContext(StoreContext);
+    const { setCartItems } = useContext(StoreContext);
     const navigate = useNavigate();
 
     const handleBack = () => {
@@ -18,17 +17,24 @@ const Navbar = () => {
     };
 
     return (
-        <div className="navbar-container d-flex justify-content-between align-items-center p-3 bg-light">
+        <div className="flex justify-between items-center p-4 bg-white shadow-md rounded-md">
             <div className="back-button">
-                <button className="btn btn-outline-secondary" onClick={handleBack}>
-                    <i className="bi bi-chevron-left"></i>
+                <button 
+                    className="flex items-center text-gray-600 hover:text-blue-600 transition duration-200"
+                    onClick={handleBack}
+                >
+                    <i className="bi bi-chevron-left mr-1"></i>
+                    <span>Quay lại</span>
                 </button>
             </div>
-            <div className="navbar-title text-center flex-fill">
-                <h5>Các món đang chọn</h5>
+            <div className="navbar-title flex-grow text-center">
+                <h3 className="text-lg font-semibold text-gray-800">Các món đang chọn</h3>
             </div>
             <div className="clear-cart-button">
-                <button className="btn btn-outline-danger" onClick={handleClearCart}>
+                <button 
+                    className="bg-red-500 text-white rounded-lg px-4 py-2 hover:bg-red-600 transition duration-200"
+                    onClick={handleClearCart}
+                >
                     Xóa giỏ
                 </button>
             </div>

@@ -1,35 +1,38 @@
 import React, { useEffect, useState, useContext } from 'react';
 import { Navbar, Container } from 'react-bootstrap';
-import { Link } from 'react-router-dom';
+import { Link, useNavigate, useSearchParams } from 'react-router-dom'; 
 import axios from 'axios';
 import { StoreContext } from '../../context/StoreContext.jsx';
-import './Navbar.css';
+import { getTableFromUrl } from '../../components/Service/TableService';
+import HomeRoundedIcon from '@mui/icons-material/HomeRounded';
 
 const CustomNavbar = () => {
-    const { url } = useContext(StoreContext); // Lấy URL từ StoreContext
+    const { url } = useContext(StoreContext);
     const [orderStatus, setOrderStatus] = useState('');
     const [status, setStatus] = useState('');
+    const [searchParams] = useSearchParams();
+    const { tableId, tableName } = getTableFromUrl(searchParams);
+    const navigate = useNavigate();
 
-    // Hàm lấy trạng thái đơn hàng theo orderId
+    // Fetch order status by orderId
     const fetchOrderStatusById = async (orderId) => {
         try {
             const response = await axios.get(`${url}/api/v1/orders/${orderId}`);
-            setOrderStatus(response.data.status); // Lưu trạng thái đơn hàng
+            setOrderStatus(response.data.status);
         } catch (error) {
             console.error('Error fetching order status:', error);
         }
     };
 
     useEffect(() => {
-        const orderId = localStorage.getItem('IdOrder'); // Lấy orderId từ localStorage
+        const orderId = localStorage.getItem('IdOrder');
         if (orderId) {
-            fetchOrderStatusById(orderId); // Gọi hàm lấy trạng thái đơn hàng
+            fetchOrderStatusById(orderId);
         } else {
             console.warn('No order ID found in localStorage.');
         }
     }, []);
 
-    // Hàm kiểm tra trạng thái đơn hàng
     const checkStatus = () => {
         if (orderStatus === "Paid") {
             setStatus("Đã thanh toán");
@@ -40,7 +43,6 @@ const CustomNavbar = () => {
         }
     };
 
-    // Gọi checkStatus mỗi khi orderStatus thay đổi
     useEffect(() => {
         if (orderStatus) {
             checkStatus();
@@ -48,23 +50,22 @@ const CustomNavbar = () => {
     }, [orderStatus]);
 
     return (
-        <Navbar bg="light" expand="lg">
+        <Navbar className="bg-white shadow-md" expand="lg">
             <Container>
-                <Navbar.Brand className="d-flex flex-column align-items-start">
-                    <div className="d-flex align-items-center">
-                        <Link to="/" className="icon-link-notification">
-                            <i className="bi bi-house-door"></i>
+                <Navbar.Brand className="flex flex-col items-start">
+                    <div className="flex items-center">
+                        <Link to={`/?table_id=${tableId}&table_name=${tableName}`} className="flex items-center text-orange-500 hover:text-orange-600 transition-colors">
+                            <HomeRoundedIcon/>
                         </Link>
-                        <span className="ms-2">
-    Các món đã gọi (
-    <span
-        style={{ color: status === "Đã thanh toán" ? "green" : status === "Đang chờ" ? "orange" : "red" }}
-    >
-        {status}
-    </span>
-    )
-</span>
-
+                        <span className="ml-3 text-lg font-semibold">
+                            Các món đã gọi (
+                            <span
+                                className={`font-bold ${status === "Đã thanh toán" ? "text-green-600" : status === "Đang chờ" ? "text-orange-600" : "text-red-600"}`}
+                            >
+                                {status}
+                            </span>
+                            )
+                        </span>
                     </div>
                 </Navbar.Brand>
             </Container>

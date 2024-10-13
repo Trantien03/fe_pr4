@@ -1,10 +1,9 @@
-// FoodItem.jsx
 import React, { useContext, useState, useEffect } from "react";
 import { assets } from "../../assets/assets";
 import { StoreContext } from "../../context/StoreContext";
 import './FoodItem.css';
 
-const FoodItem = ({ id, name, price, discount, image }) => { // Loại bỏ addToCart từ props
+const FoodItem = ({ id, name, price, discount, image, status }) => { // Thêm status vào props
     const { cartItems, addToCart, removeFromItem, url } = useContext(StoreContext);
     const [quantity, setQuantity] = useState(cartItems?.[id] || 0);
     const [isAdding, setIsAdding] = useState(false); // Trạng thái quản lý nút hoạt động
@@ -32,17 +31,20 @@ const FoodItem = ({ id, name, price, discount, image }) => { // Loại bỏ addT
         }
     };
 
+    console.log('Status of food item:', status); // Kiểm tra giá trị status
+    const isAvailable = status === 'available';
+
 
     return (
-        <div className='food-item'>
+        <div className={`food-item ${!isAvailable ? 'disabled' : ''}`}> {/* Thêm lớp disabled */}
             <div className="food-item-img-container">
                 <img className='food-item-image' src={`${url}/images/${image}`} alt={name} />
                 {discount && <div className='food-item-discount'>-{numericDiscount}%</div>}
                 <div className='food-item-counter'>
                     {quantity === 0 ? (
                         <img
-                            className={`add ${isAdding ? 'active' : ''}`}
-                            onClick={handleAdd}
+                            className={`add ${isAdding ? 'active' : ''} ${!isAvailable ? 'disabled' : ''}`} // Thêm lớp disabled
+                            onClick={isAvailable ? handleAdd : null} // Chỉ cho phép thêm nếu còn hàng
                             src={assets.add_icon_white}
                             alt="Add to cart"
                         />
@@ -57,7 +59,7 @@ const FoodItem = ({ id, name, price, discount, image }) => { // Loại bỏ addT
                             <p className="quantity-display">{quantity}</p>
                             <img
                                 className='add'
-                                onClick={handleAdd}
+                                onClick={isAvailable ? handleAdd : null} // Chỉ cho phép thêm nếu còn hàng
                                 src={assets.add_icon_green}
                                 alt="Add more"
                             />

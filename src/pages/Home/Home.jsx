@@ -1,18 +1,17 @@
 import React, { useEffect, useState } from 'react';
-import { Link, useNavigate } from 'react-router-dom';
-import './Home.css';
+import { Link, useNavigate, useSearchParams } from 'react-router-dom';
+
 import headerImage from '../../assets/home_header.jpg';
-import paymentImage from '../../assets/request_payment.svg';
-import serviceImage from '../../assets/request_service.svg';
-import rateImage from '../../assets/rate.svg';
+
 import menuImage from '../../assets/menu.svg';
 import morningIcon from '../../assets/sun.svg';
 import afternoonIcon from '../../assets/sun.svg';
 import eveningIcon from '../../assets/moon.svg';
 import editIcon from '../../assets/edit_pencil.svg';
-import { Button, Form, Modal } from "react-bootstrap";
-import './CustomModel.css';
+import { Button } from "react-bootstrap";
+
 import ButtonHome from "./Button";
+import { getTableFromUrl, setTableToUrl } from '../../components/Service/TableService'; // Import các hàm từ service
 
 const Home = () => {
   const [customerName, setCustomerName] = useState('');
@@ -20,9 +19,12 @@ const Home = () => {
   const [icon, setIcon] = useState(morningIcon);
   const [isEditing, setIsEditing] = useState(false);
   const [newName, setNewName] = useState('');
+  const [searchParams] = useSearchParams(); // Thêm useSearchParams để lấy tham số từ URL
 
   const navigate = useNavigate();
 
+  // Lấy thông tin bàn từ URL
+  const { tableId, tableName } = getTableFromUrl(searchParams);
 
   useEffect(() => {
     const name = localStorage.getItem('username');
@@ -66,8 +68,13 @@ const Home = () => {
   };
 
   const goToMenu = () => {
-    navigate('/menu');
+    // Cập nhật URL với ID và tên bàn trước khi điều hướng
+    const params = new URLSearchParams();
+    params.set('table_id', tableId); // ID bàn
+    params.set('table_name', tableName); // Tên bàn
+    navigate(`/menu?${params.toString()}`); // Điều hướng đến Menu với URL mới
   };
+
 
   return (
       <>
@@ -77,14 +84,14 @@ const Home = () => {
           </div>
 
           <div className="greeting">
-          <span className="greeting-text">
-            <img src={icon} alt="Greeting Icon" className="greeting-icon" />
-            {greeting} <b className="customer-name">&nbsp; {customerName || 'Guest!'}</b>
-            <button className="edit-button" onClick={handleEditClick}>
-              <img src={editIcon} alt="Edit Icon" />
-            </button>
-          </span>
-            <p>We will return your item to you at the table: <span className="table-number">B18</span></p>
+            <span className="greeting-text">
+              <img src={icon} alt="Greeting Icon" className="greeting-icon" />
+              {greeting} <b className="customer-name">&nbsp; {customerName || 'Guest!'}</b>
+              <button className="edit-button" onClick={handleEditClick}>
+                <img src={editIcon} alt="Edit Icon" />
+              </button>
+            </span>
+            <p>We will return your item to you at the table: <span className="table-number">{tableName || 'N/A'}</span></p>
 
             {isEditing && (
                 <div className="edit-name">
@@ -108,7 +115,7 @@ const Home = () => {
             </button>
           </div>
         </div>
-        <Link to={"/notification"} className="notification-icon">
+        <Link to={`/notification?table_id=${tableId}&table_name=${tableName}`} className="notification-icon">
           <img src="src/assets/notification.png" alt="Notification"/>
         </Link>
       </>
