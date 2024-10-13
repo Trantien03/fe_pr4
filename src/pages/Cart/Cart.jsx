@@ -76,7 +76,7 @@ const Cart = () => {
                 <div className="container mx-auto p-4">
                     <div className="flex flex-col lg:flex-row lg:space-x-4">
                         {/* List of Cart Items */}
-                        <div className="bg-white shadow-lg rounded-lg p-6 lg:w-2/3">
+                        <div className="bg-white shadow-lg rounded-lg p-6 lg:w-3/4">
                             <div className="cart-items">
                                 <div className="grid grid-cols-7 text-center font-bold text-gray-600">
                                     <div>Items</div>
@@ -123,7 +123,7 @@ const Cart = () => {
                         </div>
 
                         {/* Cart Totals */}
-                        <div className="mt-6 lg:mt-0 bg-white shadow-lg rounded-lg p-6 lg:w-1/3">
+                        <div className="mt-6 lg:mt-0 bg-white shadow-lg rounded-lg p-6 lg:w-1/4">
                             <h2 className="text-lg font-semibold">Cart Totals</h2>
                             <div className="flex justify-between mt-4">
                                 <p>Subtotal (Original Price):</p>
