@@ -7,6 +7,8 @@ import MenuHeader from './MenuHeader.jsx';
 import FoodDetailModal from './FoodDetailModal.jsx';
 import ShoppingCartCheckoutIcon from '@mui/icons-material/ShoppingCartCheckout';
 import ArrowForwardOutlinedIcon from '@mui/icons-material/ArrowForwardOutlined';
+import MenuIcon from '@mui/icons-material/Menu'; // Import Menu Icon from Material UI
+import CloseIcon from '@mui/icons-material/Close'; // Import Close Icon from Material UI
 
 const Menu = () => {
   const { cartItems, food_list } = useContext(StoreContext);
@@ -16,8 +18,9 @@ const Menu = () => {
   const [selectedCategory, setSelectedCategory] = useState(null);
   const [selectedFoodItem, setSelectedFoodItem] = useState(null);
   const [isModalOpen, setIsModalOpen] = useState(false);
-  const [currentPage, setCurrentPage] = useState(1); // State để quản lý trang hiện tại
-  const [itemsPerPage] = useState(8); // Số lượng món ăn trên mỗi trang
+  const [isMenuOpen, setIsMenuOpen] = useState(false); // State to manage menu visibility
+  const [currentPage, setCurrentPage] = useState(1); 
+  const [itemsPerPage] = useState(8);
   const navigate = useNavigate();
   const [searchParams] = useSearchParams();
   const { tableId, tableName } = getTableFromUrl(searchParams);
@@ -46,12 +49,10 @@ const Menu = () => {
     setFilteredFoodList(results);
   }, [searchTerm, food_list, selectedCategory]);
 
-  // Tính toán các món ăn được hiển thị dựa trên trang hiện tại
   const indexOfLastItem = currentPage * itemsPerPage;
   const indexOfFirstItem = indexOfLastItem - itemsPerPage;
   const currentFoodList = filteredFoodList.slice(indexOfFirstItem, indexOfLastItem);
 
-  // Tính toán tổng số trang
   const totalPages = Math.ceil(filteredFoodList.length / itemsPerPage);
 
   const openModal = (item) => {
@@ -73,17 +74,28 @@ const Menu = () => {
 
   const totalItems = Object.values(cartItems).reduce((acc, quantity) => acc + quantity, 0);
 
-  // Hàm để chuyển trang
   const handlePageChange = (pageNumber) => {
     setCurrentPage(pageNumber);
+  };
+
+  const toggleMenu = () => {
+    setIsMenuOpen(!isMenuOpen); // Toggle menu state
   };
 
   return (
     <>
       <div className="container mx-auto p-4">
         <div className="flex flex-col md:flex-row">
-          {/* Sidebar Menu Header */}
-          <div className="w-full md:w-1/4 mb-4 md:mb-0">
+          {/* Menu Icon for mobile */}
+          <div className="md:hidden flex justify-between items-center mb-4">
+            <h2 className="text-2xl font-semibold text-orange-600">Menu</h2>
+            <button onClick={toggleMenu}>
+              {isMenuOpen ? <CloseIcon fontSize="large" /> : <MenuIcon fontSize="large" />} {/* Toggle between Menu and Close icon */}
+            </button>
+          </div>
+
+          {/* MenuHeader will be hidden or shown based on state */}
+          <div className={`w-full md:w-1/4 mb-4 md:mb-0 ${isMenuOpen ? 'block' : 'hidden'} md:block`}>
             <MenuHeader
               categories={categories}
               selectedCategory={selectedCategory}
@@ -94,13 +106,12 @@ const Menu = () => {
             />
           </div>
 
-          {/* Dishes List */}
           <div className="w-full md:w-3/4">
-            <h2 className="text-2xl font-semibold mb-4 text-orange-600">Danh Sách Món Ăn</h2>
+            <h2 className="text-2xl font-semibold mb-4 text-orange-600 text-center md:text-left">Danh Sách Món Ăn</h2>
             {currentFoodList.length === 0 ? (
-              <p className="text-red-500">Không có món ăn nào trong danh mục này.</p>
+              <p className="text-red-500 text-center">Không có món ăn nào trong danh mục này.</p>
             ) : (
-              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
+              <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
                 {currentFoodList.map(item => (
                   <div key={item.id} className="mx-1 p-1 transition-transform transform">
                     <FoodItem
@@ -117,15 +128,12 @@ const Menu = () => {
               </div>
             )}
 
-            {/* Pagination Controls */}
             {totalPages > 1 && (
               <div className="mt-4 flex justify-center">
                 {Array.from({ length: totalPages }, (_, index) => (
                   <button
                     key={index}
-                    className={`mx-1 px-3 py-1 rounded ${
-                      currentPage === index + 1 ? 'bg-orange-500 text-white' : 'bg-gray-200 text-gray-800'
-                    }`}
+                    className={`mx-1 px-3 py-1 rounded ${currentPage === index + 1 ? 'bg-orange-500 text-white' : 'bg-gray-200 text-gray-800'}`}
                     onClick={() => handlePageChange(index + 1)}
                   >
                     {index + 1}
@@ -136,7 +144,6 @@ const Menu = () => {
           </div>
         </div>
 
-        {/* Cart Bar */}
         {totalItems > 0 && (
           <div className="fixed bottom-0 right-0 mb-4 mr-4 bg-orange-600 text-white p-3 rounded-lg shadow-lg flex items-center cursor-pointer" onClick={goToCart}>
             <ShoppingCartCheckoutIcon className="mr-2" />
