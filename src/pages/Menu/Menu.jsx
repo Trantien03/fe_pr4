@@ -111,7 +111,7 @@ const Menu = () => {
             {currentFoodList.length === 0 ? (
               <p className="text-red-500 text-center">Không có món ăn nào trong danh mục này.</p>
             ) : (
-              <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
+              <div className="grid grid-cols-2 sm:grid-cols-2 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
                 {currentFoodList.map(item => (
                   <div key={item.id} className="mx-1 p-1 transition-transform transform">
                     <FoodItem
