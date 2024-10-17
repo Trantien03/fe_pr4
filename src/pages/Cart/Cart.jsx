@@ -74,11 +74,11 @@ const Cart = () => {
             <Navbar />
             {Object.keys(cartItems).length > 0 ? (
                 <div className="container mx-auto p-4">
-                    <div className="flex flex-col lg:flex-row lg:space-x-4">
+                    <div className="flex flex-col space-y-4 lg:flex-row lg:space-x-4">
                         {/* List of Cart Items */}
-                        <div className="bg-white shadow-lg rounded-lg p-6 lg:w-3/4">
+                        <div className="bg-white shadow-lg rounded-lg p-4 lg:w-3/4">
                             <div className="cart-items">
-                                <div className="grid grid-cols-7 text-center font-bold text-gray-600">
+                                <div className="hidden lg:grid grid-cols-7 text-center font-bold text-gray-600">
                                     <div>Items</div>
                                     <div>Title</div>
                                     <div>Price</div>
@@ -94,14 +94,14 @@ const Cart = () => {
                                         const discount = item.discount ? parseFloat(item.discount) : 0;
                                         const discountedPrice = item.price * (1 - (discount / 100));
                                         return (
-                                            <div key={item._id} className="grid grid-cols-7 items-center text-center py-4 border-b">
-                                                <div>
+                                            <div key={item._id} className="grid grid-cols-2 lg:grid-cols-7 items-center text-center py-4 border-b">
+                                                <div className="lg:col-span-1">
                                                     <img src={`${url}/images/${item.image}`} alt={item.name} className="w-16 h-16 object-cover mx-auto" />
                                                 </div>
-                                                <div>{item.name}</div>
-                                                <div>${item.price.toFixed(2)}</div>
-                                                <div>{discount > 0 ? `${discount}%` : 'No discount'}</div>
-                                                <div>
+                                                <div className="lg:col-span-1">{item.name}</div>
+                                                <div className="hidden lg:block">${item.price.toFixed(2)}</div>
+                                                <div className="hidden lg:block">{discount > 0 ? `${discount}%` : 'No discount'}</div>
+                                                <div className="lg:col-span-1">
                                                     <input
                                                         type="number"
                                                         min="1"
@@ -110,8 +110,8 @@ const Cart = () => {
                                                         className="w-16 text-center border border-gray-300 rounded-md"
                                                     />
                                                 </div>
-                                                <div>${(discountedPrice * quantity).toFixed(2)}</div>
-                                                <div>
+                                                <div className="hidden lg:block">${(discountedPrice * quantity).toFixed(2)}</div>
+                                                <div className="lg:col-span-1">
                                                     <button onClick={() => removeFromCart(item.id)} className='text-red-500 hover:text-red-700'>x</button>
                                                 </div>
                                             </div>
@@ -123,7 +123,7 @@ const Cart = () => {
                         </div>
 
                         {/* Cart Totals */}
-                        <div className="mt-6 lg:mt-0 bg-white shadow-lg rounded-lg p-6 lg:w-1/4">
+                        <div className="mt-5 lg:mt-0 bg-white shadow-lg rounded-lg p-4 lg:w-1/4">
                             <h2 className="text-lg font-semibold">Cart Totals</h2>
                             <div className="flex justify-between mt-4">
                                 <p>Subtotal (Original Price):</p>
@@ -151,7 +151,7 @@ const Cart = () => {
                 </div>
             ) : (
                 <div className="flex flex-col items-center justify-center h-screen bg-orange-50">
-                    <img src="/src/assets/cart_empty.jpg" alt="Empty Cart" className="w-1/3 mb-4" />
+                    <img src="/src/assets/cart_empty.jpg" alt="Empty Cart" className="w-2/3 md:w-1/3 mb-4" />
                     <p className="text-gray-600 text-lg mb-4">Vui lòng chọn đồ ăn!</p>
                     <Link to={`/menu?table_id=${tableId}&table_name=${tableName}`} className="bg-orange-500 text-white font-semibold py-2 px-4 rounded-lg hover:bg-orange-600 transition duration-300">
                         Đi đến Menu
