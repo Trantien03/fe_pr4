@@ -1,24 +1,55 @@
-import React from 'react';
+import React, { useEffect, useState } from 'react';
+import CloseIcon from '@mui/icons-material/Close';
+import { getFoodDetail } from './apiService'; // Import API service for fetching food details
 
-const FoodDetailModal = ({ isOpen, onClose, foodItem }) => {
-  if (!isOpen || !foodItem) return null; // Đảm bảo modal không mở khi không có foodItem
+const FoodDetailModal = ({ isOpen, onClose, foodId }) => {
+  const [foodItem, setFoodItem] = useState(null); // State to hold the food item details
+
+  useEffect(() => {
+    if (isOpen && foodId) {
+      // Fetch food details when modal is open and foodId is provided
+      getFoodDetail(foodId).then(data => setFoodItem(data));
+    }
+  }, [isOpen, foodId]);
+
+  if (!isOpen || !foodItem) return null; // Don't render if modal is closed or foodItem is null
 
   return (
-    <div className="fixed inset-0 bg-black bg-opacity-70 flex justify-center items-center z-50">
-      <div className="bg-white rounded-lg p-6 w-full max-w-md shadow-lg">
-        <button className="absolute top-4 right-4 text-red-500 text-lg" onClick={onClose}>
-          X
+    <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
+      <div className="relative w-full max-w-lg bg-white rounded-lg shadow-lg overflow-hidden dark:bg-gray-700">
+        {/* Close modal button */}
+        <button
+          className="absolute top-2 right-2 text-gray-800 dark:text-gray-50"
+          onClick={onClose}
+        >
+          <CloseIcon />
         </button>
-        <h2 className="text-2xl font-bold mb-2">{foodItem.name}</h2>
-        <img 
-          src={foodItem.image} 
-          alt={foodItem.name} 
-          className="w-full h-auto rounded-md mb-4" 
-        />
-        <p className="text-lg text-gray-700 mb-2">Giá: <span className="font-semibold">{foodItem.price} VND</span></p>
-        <p className="text-lg text-gray-700 mb-4">Giảm giá: <span className="font-semibold">{foodItem.discount}%</span></p>
-        <p className="text-md text-gray-600 mb-4">Mô tả: {foodItem.description || 'Không có mô tả'}</p>
-        {/* Thêm các thông tin khác nếu cần */}
+
+        {/* Display food item details */}
+        <article className="max-w-sm w-full bg-white rounded-lg shadow-lg overflow-hidden dark:bg-gray-700">
+          <div>
+            <img
+              className="object-cover h-64 w-full"
+              src={`http://localhost:8080/public/img/${foodItem.image}`} // Image URL from backend
+              alt={foodItem.name}
+            />
+          </div>
+
+          <div className="flex flex-col gap-1 mt-4 px-4">
+            <h2 className="text-lg font-semibold text-gray-800 dark:text-gray-50">{foodItem.name}</h2>
+            <span className="font-normal text-gray-600 dark:text-gray-300">{foodItem.description || 'No description available'}</span>
+            <span className="font-semibold text-gray-800 dark:text-gray-50">${foodItem.price}</span>
+          </div>
+
+          <div className="mt-4 p-4 border-t border-gray-200 dark:border-gray-500">
+            <button className="w-full flex justify-between items-center font-bold cursor-pointer hover:underline text-gray-800 dark:text-gray-50">
+              <span className="text-base">Add to Cart</span>
+              <svg className="h-6 w-6" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M12 6v6m0 0v6m0-6h6m-6 0H6" />
+              </svg>
+            </button>
+          </div>
+        </article>
       </div>
     </div>
   );

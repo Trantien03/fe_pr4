@@ -1,9 +1,11 @@
 import { createContext, useEffect, useState } from "react";
+import { useNavigate } from "react-router-dom";  // Thêm import này
 import axios from 'axios';
 
 export const StoreContext = createContext(null);
 
 const StoreContextProvider = (props) => {
+    const navigate = useNavigate();  // Sử dụng useNavigate để điều hướng
     const [cartItems, setCartItems] = useState(() => {
         const savedCart = localStorage.getItem('cartItems');
         return savedCart ? JSON.parse(savedCart) : {};
@@ -14,7 +16,6 @@ const StoreContextProvider = (props) => {
     const [orderDishes, setOrderDishes] = useState([]);
     const [dishes, setListDishes] = useState([]);
 
-    // Hàm lấy danh sách món ăn theo orderId
     const fetchDishesByOrderId = async (orderId) => {
         try {
             const response = await axios.get(`${url}/api/v1/order_item/${orderId}`);
@@ -32,34 +33,25 @@ const StoreContextProvider = (props) => {
         } else {
             console.warn("No order ID found in localStorage.");
         }
-    }, []); // Chạy một lần khi component được mount
+    }, []);
 
-    // Hàm thêm sản phẩm vào giỏ hàng
     const addToCart = (id) => {
         setCartItems(prevItems => {
             const updatedItems = { ...prevItems, [id]: (prevItems[id] || 0) + 1 };
             localStorage.setItem('cartItems', JSON.stringify(updatedItems));
-            console.log("Updated Cart Items: ", updatedItems); // Xem nội dung giỏ hàng
             return updatedItems;
         });
     };
 
-    // Hàm xóa sản phẩm khỏi giỏ hàng
     const removeFromCart = (id) => {
         setCartItems(prevItems => {
             const updatedItems = { ...prevItems };
-
-            // Xóa toàn bộ sản phẩm ra khỏi giỏ hàng
             delete updatedItems[id];
-
-            // Cập nhật localStorage
             localStorage.setItem('cartItems', JSON.stringify(updatedItems));
-
             return updatedItems;
         });
     };
 
-    // Hàm cập nhật số lượng sản phẩm trong giỏ hàng
     const updateQuantity = (id, quantity) => {
         setCartItems(prevItems => {
             const updatedItems = { ...prevItems };
@@ -74,28 +66,24 @@ const StoreContextProvider = (props) => {
         });
     };
 
-    // Hàm tính tổng số tiền trong giỏ hàng
     const getTotalCartAmount = () => {
         let totalAmount = 0;
         for (const item in cartItems) {
             if (cartItems[item] > 0) {
                 let itemInfo = food_list.find((product) => product._id === item);
-                if (itemInfo) { // Kiểm tra itemInfo có tồn tại
+                if (itemInfo) {
                     totalAmount += itemInfo.price * cartItems[item];
-                } else {
-                    console.log(`Product with id ${item} not found in food_list`);
                 }
             }
         }
         return totalAmount;
     };
 
-    // Hàm lấy danh sách món ăn
     const fetchFoodList = async () => {
         try {
             const response = await axios.get(`${url}/api/v1/dishes`);
             setFoodList(response.data.content);
-            console.log("Fetched food list: ", response.data.content); // Xem danh sách món ăn
+            console.log("Fetched food list: ", response.data.content);
         } catch (error) {
             console.error("Error fetching food list:", error);
         }
@@ -104,16 +92,11 @@ const StoreContextProvider = (props) => {
     const removeFromItem = (id) => {
         setCartItems(prevItems => {
             const updatedItems = { ...prevItems };
-
             if (updatedItems[id] > 1) {
-                // Nếu số lượng sản phẩm lớn hơn 1, giảm số lượng
                 updatedItems[id] -= 1;
             } else {
-                // Nếu số lượng sản phẩm bằng 1, xóa sản phẩm khỏi giỏ hàng
                 delete updatedItems[id];
             }
-
-            // Cập nhật giỏ hàng trong localStorage
             localStorage.setItem('cartItems', JSON.stringify(updatedItems));
             return updatedItems;
         });
@@ -121,10 +104,15 @@ const StoreContextProvider = (props) => {
 
     useEffect(() => {
         const loadData = async () => {
-            await fetchFoodList(); // Lấy danh sách món ăn
+            await fetchFoodList();
         };
         loadData();
     }, []);
+
+    // Hàm điều hướng đến trang chi tiết sản phẩm
+    const viewProductDetails = (productId) => {
+        navigate(`/product/${productId}`);
+    };
 
     const contextValue = {
         food_list,
@@ -140,7 +128,8 @@ const StoreContextProvider = (props) => {
         fetchFoodList,
         fetchDishesByOrderId,
         orderDishes,
-        dishes// Thêm danh sách món ăn theo order
+        dishes,
+        viewProductDetails  // Truyền hàm điều hướng vào context
     }
 
     return (

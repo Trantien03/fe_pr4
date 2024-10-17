@@ -7,8 +7,9 @@ import MenuHeader from './MenuHeader.jsx';
 import FoodDetailModal from './FoodDetailModal.jsx';
 import ShoppingCartCheckoutIcon from '@mui/icons-material/ShoppingCartCheckout';
 import ArrowForwardOutlinedIcon from '@mui/icons-material/ArrowForwardOutlined';
-import MenuIcon from '@mui/icons-material/Menu'; // Import Menu Icon from Material UI
-import CloseIcon from '@mui/icons-material/Close'; // Import Close Icon from Material UI
+import MenuIcon from '@mui/icons-material/Menu';
+import CloseIcon from '@mui/icons-material/Close';
+import MenuCoupon from './MenuCoupon.jsx';
 
 const Menu = () => {
   const { cartItems, food_list } = useContext(StoreContext);
@@ -18,13 +19,14 @@ const Menu = () => {
   const [selectedCategory, setSelectedCategory] = useState(null);
   const [selectedFoodItem, setSelectedFoodItem] = useState(null);
   const [isModalOpen, setIsModalOpen] = useState(false);
-  const [isMenuOpen, setIsMenuOpen] = useState(false); // State to manage menu visibility
+  const [isMenuOpen, setIsMenuOpen] = useState(false);
   const [currentPage, setCurrentPage] = useState(1); 
   const [itemsPerPage] = useState(8);
   const navigate = useNavigate();
   const [searchParams] = useSearchParams();
   const { tableId, tableName } = getTableFromUrl(searchParams);
 
+  // Fetch categories on mount
   useEffect(() => {
     const fetchCategories = async () => {
       try {
@@ -38,6 +40,7 @@ const Menu = () => {
     fetchCategories();
   }, []);
 
+  // Filter food list based on search term and selected category
   useEffect(() => {
     const results = food_list.filter(item => {
       const matchesSearchTerm = item.name?.toLowerCase().includes(searchTerm.toLowerCase());
@@ -56,13 +59,13 @@ const Menu = () => {
   const totalPages = Math.ceil(filteredFoodList.length / itemsPerPage);
 
   const openModal = (item) => {
-    setSelectedFoodItem(item);
-    setIsModalOpen(true);
+    setSelectedFoodItem(item); // Gán giá trị món ăn được chọn
+    setIsModalOpen(true); // Mở modal
   };
 
   const closeModal = () => {
-    setIsModalOpen(false);
-    setSelectedFoodItem(null);
+    setIsModalOpen(false); // Đóng modal
+    setSelectedFoodItem(null); // Xoá dữ liệu món ăn khi đóng modal
   };
 
   const goToCart = () => {
@@ -86,7 +89,6 @@ const Menu = () => {
     <>
       <div className="container mx-auto p-4">
         <div className="flex flex-col md:flex-row">
-          {/* Menu Icon for mobile */}
           <div className="md:hidden flex justify-between items-center mb-4">
             <h2 className="text-2xl font-semibold text-orange-600">Menu</h2>
             <button onClick={toggleMenu}>
@@ -94,7 +96,6 @@ const Menu = () => {
             </button>
           </div>
 
-          {/* MenuHeader will be hidden or shown based on state */}
           <div className={`w-full md:w-1/4 mb-4 md:mb-0 ${isMenuOpen ? 'block' : 'hidden'} md:block`}>
             <MenuHeader
               categories={categories}
@@ -104,6 +105,8 @@ const Menu = () => {
               setSearchTerm={setSearchTerm}
               goHome={() => navigate(`/?table_id=${tableId}&table_name=${tableName}`)}
             />
+            <hr/>
+            <MenuCoupon/>
           </div>
 
           <div className="w-full md:w-3/4">
@@ -121,7 +124,7 @@ const Menu = () => {
                       discount={item.discount}
                       image={item.image}
                       status={item.status}
-                      onClick={() => openModal(item)}
+                      onClick={() => openModal(item)} // Trigger modal when clicking on the food item
                     />
                   </div>
                 ))}
@@ -153,11 +156,14 @@ const Menu = () => {
         )}
       </div>
 
-      <FoodDetailModal
-        isOpen={isModalOpen}
-        onClose={closeModal}
-        foodItem={selectedFoodItem}
-      />
+      {/* Modal hiện chi tiết sản phẩm */}
+      {isModalOpen && selectedFoodItem && (
+        <FoodDetailModal
+          isOpen={isModalOpen}
+          onClose={closeModal}
+          foodItem={selectedFoodItem} // Truyền thông tin món ăn vào modal
+        />
+      )}
     </>
   );
 };
